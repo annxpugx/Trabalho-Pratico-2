@@ -148,6 +148,7 @@ public class Jogador{
         // + " ## " +J.getUniversidade()+ " ## " + J.getCidadeNacimento() + " ## " + J.getEstadoNascimento() + "]");
 
     }
+
         
     public static void main(String[] args) throws Exception{
         String[] entrada_id = new String[100];

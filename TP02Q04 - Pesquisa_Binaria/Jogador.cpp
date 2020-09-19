@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <sstream>
+#include <time.h>
 using namespace std;
 #define bool short
 #define true 1
@@ -134,6 +135,8 @@ struct Jogador {
         //Jogador J = Jogador(id, substr[1], inteiros[0], inteiros[1], substr[4], inteiros[2], substr[6], substr[7]);
 
         this->setId(id);
+        char *asteriscPtr = strchr(substr[1], '*');
+        if (asteriscPtr != NULL) *asteriscPtr = '\0';
         this->setNome(substr[1]);
         this->setAltura(inteiros[0]);
         this->setPeso(inteiros[1]);
@@ -151,10 +154,10 @@ struct Jogador {
 char *ler (int id){
     FILE *players;
     //abrindo o arquivo
-    players = fopen("/tmp/players.csv", "rw");
+    players = fopen("/tmp/players.csv", "r");
 
     char linha[TAM_LINHA];
-    char *linha_corrigida;
+    char *linha_corrigida = (char *) malloc(sizeof(char) * TAM_LINHA);
     int i = 0;
     char lixo[TAM_LINHA];
 
@@ -164,21 +167,26 @@ char *ler (int id){
     lerLinha(linha, TAM_LINHA, players);
 
     strcpy(linha_corrigida, linha);
+    fclose(players);
+    
     return linha_corrigida;
 }
 
-bool pesqBin(char vet[][100], char x[], int tam){
+bool pesqBin(char vet[][100], char x[], int tam, int *comp){
     bool resp = false;
     int dir = (tam - 1), esq = 0, meio;
 
     while (esq <= dir){
         meio = (esq + dir) / 2;
         if(strcmp(x, vet[meio]) == 0){
+            (*comp)++;
             resp = true;
             esq = dir + 1;
         } else if (strcmp(x, vet[meio]) > 0) {
+            (*comp)+= 2;
             esq = meio + 1;
         } else {
+            (*comp) += 2;
             dir = meio - 1;
         }
     }
@@ -208,7 +216,7 @@ int main(){
     int numEntrada_id = 0;
     int linha = 0;
     do{
-        lerLinha(entrada_id[numEntrada_id], 1000, stdin);
+        lerLinha(entrada_id[numEntrada_id], 5, stdin);
     }while (isFim(entrada_id[numEntrada_id++]) == false);
     numEntrada_id--;
 
@@ -221,7 +229,9 @@ int main(){
     char saida[100][TAM_LINHA];
 
     for(int i = 0; i < numEntrada_id; i++){
-        strcpy(saida[i], ler(entrada_inteiro[i]));
+        char *csv = ler(entrada_inteiro[i]);
+        strcpy(saida[i], csv);
+        free(csv);
     }
 
     char entrada_nome[200][100];
@@ -252,11 +262,20 @@ int main(){
     //     printf("%s\n", nomes[i]);
     // }
 
+    time_t tempo = clock();
+    int comp = 0;
     //printf("%s\n", entrada_nome[94]);
     for(int i = 0; i < numEntrada_nome; i++){
-        if(pesqBin(nomes, entrada_nome[i], numEntrada_id) == true)
+        if(pesqBin(nomes, entrada_nome[i], numEntrada_id, &comp) == true)
             printf("SIM\n");
         else
             printf("NAO\n");
-    }  
+    }
+
+    tempo = clock() - tempo;
+
+    FILE *matricula;
+    matricula = fopen("matricula_binaria.txt", "w");
+    fprintf(matricula, "694370\t %d \t %lu", comp, tempo);
+    fclose(matricula);  
 }

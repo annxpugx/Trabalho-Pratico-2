@@ -120,11 +120,11 @@ struct Jogador {
 
     //METODOS
 
-    void salvar(int id, char *linha[]){
+    void salvar(int id, char *linha){
         char *strsep(char **stringp, const char *delim);
         char *substr[8];
         for(int i = 0; i < 8; i++)
-            substr[i] = strsep(&linha[id], ",");
+            substr[i] = strsep(&linha, ",");
 
         int inteiros[3];
         sscanf(substr[2], "%d", &inteiros[0]);
@@ -148,83 +148,65 @@ struct Jogador {
 
 };
 
-char *ler (){
+char *ler (int id){
     FILE *players;
     //abrindo o arquivo
     players = fopen("/tmp/players.csv", "rw");
 
-    char linhas[TAM_ARQUIVO][TAM_LINHA];
-    char linhas_corrigidas[TAM_ARQUIVO][TAM_LINHA];
+    char linha[TAM_LINHA];
+    char *linha_corrigida;
     int i = 0;
     char lixo[TAM_LINHA];
-    lerLinha(lixo, TAM_LINHA, players);
-    do{
-        lerLinha(linhas[i++], TAM_LINHA, players);
-    } while(!feof(players));
-    i--;
 
-    char corrige[] = ",nao informado";
-
-    for(int j = 0; j < i; j++){
-        for(int z = 0, x = 0; x < strlen(linhas[j]); x++){
-            if(linhas[j][x] == ',' && linhas[j][x+1] == ','){
-                strcat(linhas_corrigidas[j],corrige);
-                z += 14;
-            }else{
-                linhas_corrigidas[j][z] = linhas[j][x];
-                z++;
-            }
-            if(x == strlen(linhas[j]) - 2 && linhas[j][x] == ',')
-                strcat(linhas_corrigidas[j],corrige);
-        }
-    }
+    for(int i = 0; i <= id; i++)
+        lerLinha(lixo, TAM_LINHA, players);
     
-    return *linhas_corrigidas;
+    lerLinha(linha, TAM_LINHA, players);
+
+    strcpy(linha_corrigida, linha);
+    return linha_corrigida;
 }
 
-void quicksortRec(char *array[], int esq, int dir) {
-    int i = esq, j = dir;
-    char pivo[100];
-    char troca[100];
-    strcpy(pivo, array[(dir+esq)/2]);
-    while (i <= j) {
-        while (strcmp(array[i] , pivo) < 0) i++;
-        while (strcmp(array[i] , pivo) > 0) j--;
-        if (i <= j) {
-            strcpy(troca, array[esq]);
-            array[esq] = array[dir];
-            array[dir] = troca;
-            esq = esq +1 ;
-            dir = dir +1;
-        }
-    }
-    if (esq < j)  quicksortRec(array, esq, j);
-    if (i < dir)  quicksortRec(array, i, dir);
-}
-
-bool pesqBin(char *vet[], char x[]){
+bool pesqBin(char vet[][100], char x[], int tam){
     bool resp = false;
-    int dir = (sizeof(vet) - 1), esq = 0, meio;
+    int dir = (tam - 1), esq = 0, meio;
 
     while (esq <= dir){
         meio = (esq + dir) / 2;
         if(strcmp(x, vet[meio]) == 0){
-        resp = true;
-        esq = dir + 1;
+            resp = true;
+            esq = dir + 1;
         } else if (strcmp(x, vet[meio]) > 0) {
-        esq = meio + 1;
+            esq = meio + 1;
         } else {
-        dir = meio - 1;
+            dir = meio - 1;
         }
     }
     return resp;
+}
+
+void swap(char array[][100], int i, int j) {
+   char temp[100];
+   strcpy(temp, array[i]);
+   strcpy(array[i], array[j]);
+   strcpy(array[j], temp);
+}
+
+void bolha(char array[][100], int n){
+    int i, j;
+    for (i = (n - 1); i > 0; i--) {
+      for (j = 0; j < i; j++) {
+         if (strcmp(array[j], array[j + 1]) > 0) {
+            swap(array, j, j + 1);
+         }
+      }
+   }
 }
 
 int main(){
     char entrada_id[100][5];
     int numEntrada_id = 0;
     int linha = 0;
-    char lixo[5];
     do{
         lerLinha(entrada_id[numEntrada_id], 1000, stdin);
     }while (isFim(entrada_id[numEntrada_id++]) == false);
@@ -236,31 +218,45 @@ int main(){
         sscanf(entrada_id[i], "%d", &entrada_inteiro[i]);
     }
 
-    char entrada_nome[100][5];
+    char saida[100][TAM_LINHA];
+
+    for(int i = 0; i < numEntrada_id; i++){
+        strcpy(saida[i], ler(entrada_inteiro[i]));
+    }
+
+    char entrada_nome[200][100];
     int numEntrada_nome = 0;
 
     do{
-        lerLinha(entrada_nome[numEntrada_nome], 1000, stdin);
+        lerLinha(entrada_nome[numEntrada_nome], 100, stdin);
     }while (isFim(entrada_nome[numEntrada_nome++]) == false);
-    numEntrada_id--;
+    numEntrada_nome--;
 
-    char saida[100][100] = ler();
-    Jogador _Jogadores[200];
+
+    Jogador _Jogadores[100];
     char nomes[100][100];
 
     for(int i = 0; i < numEntrada_id; i++){
         _Jogadores[i] = Jogador();
-        _Jogadores[i].salvar(entrada_inteiro[i], saida);
+        _Jogadores[i].salvar(entrada_inteiro[i], saida[i]);
         strcpy(nomes[i], _Jogadores[i].getNome());
     }
 
-    quicksortRec(nomes, 0, numEntrada_id);
+    // for(int i = 0; i < numEntrada_id; i++){
+    //     printf("%s\n", nomes[i]);
+    // }
 
+    bolha(nomes, numEntrada_id);
+
+    // for(int i = 0; i < numEntrada_id; i++){
+    //     printf("%s\n", nomes[i]);
+    // }
+
+    //printf("%s\n", entrada_nome[94]);
     for(int i = 0; i < numEntrada_nome; i++){
-        if(pesqBin(nomes, entrada_nome[i]) == true)
-            printf("SIM");
+        if(pesqBin(nomes, entrada_nome[i], numEntrada_id) == true)
+            printf("SIM\n");
         else
-            printf("NAO");
-    }
-        
+            printf("NAO\n");
+    }  
 }

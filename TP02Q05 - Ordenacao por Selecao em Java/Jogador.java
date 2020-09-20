@@ -124,14 +124,16 @@ public class Jogador{
         } while (entrada[numEntrada++] != null);
         numEntrada --;
 
-        for(int i = 1; i < numEntrada; i++)
+        for(int i = 1; i < numEntrada; i++){
             if(entrada[i].contains(",,")){
                 entrada[i] = entrada[i].replaceAll(",,", ",nao informado,");
-                int tam = entrada[i].length()-1;
-                if(entrada[i].charAt(tam) == ','){
-                    entrada[i] += "nao informado";   
-                }
+                
             }
+            int tam = entrada[i].length()-1;
+            if(entrada[i].charAt(tam) == ','){
+                entrada[i] += "nao informado";   
+            }
+        }
 
         br.close();
         return entrada;

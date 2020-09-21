@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <sstream>
 #include <time.h>
-using namespace std;
+//using namespace std;
 #define bool short
 #define true 1
 #define false 0
@@ -135,8 +135,8 @@ struct Jogador {
         //Jogador J = Jogador(id, substr[1], inteiros[0], inteiros[1], substr[4], inteiros[2], substr[6], substr[7]);
 
         this->setId(id);
-        char *asteriscPtr = strchr(substr[1], '*');
-        if (asteriscPtr != NULL) *asteriscPtr = '\0';
+        // char *asteriscPtr = strchr(substr[1], '*');
+        // if (asteriscPtr != NULL) *asteriscPtr = '\000';
         this->setNome(substr[1]);
         this->setAltura(inteiros[0]);
         this->setPeso(inteiros[1]);
@@ -212,17 +212,23 @@ void bolha(char array[][100], int n){
 }
 
 int main(){
-    char entrada_id[100][5];
+    char entrada_id[200][10];
     int numEntrada_id = 0;
-    int linha = 0;
     do{
-        lerLinha(entrada_id[numEntrada_id], 5, stdin);
+        lerLinha(entrada_id[numEntrada_id], 10, stdin);
     }while (isFim(entrada_id[numEntrada_id++]) == false);
     numEntrada_id--;
+    //printf("%d\n", numEntrada_id);
 
-    int entrada_inteiro[100];
+    // for(int i = 0, j = 0; j < numEntrada_id/2; i++, j+= 2)
+    //     strcpy(entrada_id[i],entrada_id[j]);
 
-    for(int i = 0; i < 100; i++){
+    // for(int i = 0; i < numEntrada_id; i++)
+    //     printf("%s\n", entrada_id[i]);
+
+    int entrada_inteiro[200];
+
+    for(int i = 0; i < 200; i++){
         sscanf(entrada_id[i], "%d", &entrada_inteiro[i]);
     }
 
@@ -243,8 +249,8 @@ int main(){
     numEntrada_nome--;
 
 
-    Jogador _Jogadores[100];
-    char nomes[100][100];
+    Jogador _Jogadores[200];
+    char nomes[200][100];
 
     for(int i = 0; i < numEntrada_id; i++){
         _Jogadores[i] = Jogador();

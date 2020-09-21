@@ -207,7 +207,7 @@ void SelectionSortR(Jogador *Jogadores, int i, int n){
 void ler (Jogador *Jogadores, int entradas[], int numEntrada){
     FILE *players;
     //abrindo o arquivo
-    players = fopen("players.csv", "r");
+    players = fopen("/tmp/players.csv", "r");
 
     char linhas[TAM_ARQUIVO][TAM_LINHA];
     char linhas_corrigidas[TAM_ARQUIVO][TAM_LINHA];

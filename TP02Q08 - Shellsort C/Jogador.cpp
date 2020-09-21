@@ -220,29 +220,34 @@ void ler (Jogador *Jogadores, int entradas[], int numEntrada){
     }
 }
 
-void swap(Jogador *array, int i, int j) {
-   Jogador temp = Jogador();
-   temp.clone(array[i]);
-   array[i].clone(array[j]);
-   array[j].clone(temp);
-}
-
-void bolha(Jogador *Jogadores, int n, int *comp, int *mov){
-    int i, j;
-    for (i = (n - 1); i > 0; i--) {
-      for (j = 0; j < i; j++) {
-        if (Jogadores[j].getAnoNascimento() > Jogadores[j+1].getAnoNascimento()) {
-            swap(Jogadores, j, j + 1);
+void insercaoPorCor(Jogador *array, int n, int cor, int h, int *comp, int *mov){
+    for (int i = (h + cor); i < n; i+=h) {
+        Jogador tmp = Jogador();
+        tmp.clone(array[i]);
+        int j = i - h;
+        (*comp)++;
+        while (((j >= 0) && (array[j].getPeso() > tmp.getPeso())) || ((j >= 0) && (array[j].getPeso() == tmp.getPeso()) && (strcmp(array[j].getNome(), tmp.getNome()) > 0))){
             (*comp)++;
-            (*mov)+=3;
-        }else if(Jogadores[j].getAnoNascimento() == Jogadores[j+1].getAnoNascimento()){
-            if(strcmp(Jogadores[j].getNome(), Jogadores[j+1].getNome()) > 0)
-                swap(Jogadores, j, j + 1);
-            (*comp)+=2;
-            (*mov)+=3;
+            (*mov)++;
+            array[j + h].clone(array[j]);
+            j-=h;
         }
-      }
-   }
+        array[j + h].clone(tmp);
+        (*mov)++;
+    }
+}
+//=============================================================================
+void shellsort(Jogador *array, int n, int *comp, int *mov) {
+    int h = 1;
+
+    do { h = (h * 3) + 1; } while (h < n);
+
+    do {
+        h /= 3;
+        for(int cor = 0; cor < h; cor++){
+            insercaoPorCor(array, n, cor, h, comp, mov);
+        }
+    } while (h != 1);
 }
 
 int main(){
@@ -266,7 +271,7 @@ int main(){
 
     int comp = 0;
     int mov = 0;
-    bolha(_Jogadores, numEntrada_id, &comp, &mov);
+    shellsort(_Jogadores, numEntrada_id, &comp, &mov);
 
     time_t tempo = clock();
     //printf("%s\n", entrada_nome[94]);
@@ -277,7 +282,7 @@ int main(){
     tempo = clock() - tempo;
 
     FILE *matricula;
-    matricula = fopen("matricula_bolha.txt", "w");
-    fprintf(matricula, "694370\t %d \t %lu", comp, tempo);
+    matricula = fopen("matricula_shellsort.txt", "w");
+    fprintf(matricula, "694370\t %d \t %d \t %lu", comp, mov, tempo);
     fclose(matricula);  
 }

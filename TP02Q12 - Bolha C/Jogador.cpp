@@ -4,8 +4,7 @@
 #include <stdlib.h>
 #include <sstream>
 #include <time.h>
-#include <math.h>
-using namespace std;
+//using namespace std;
 #define bool short
 #define true 1
 #define false 0
@@ -120,31 +119,7 @@ struct Jogador {
         return anoNascimento;
     }
 
-    void imprimir(){
-        printf("[%d ## %s ## %d ## %d ## %d ## %s ## %s ## %s]\n", this->getId(), this->getNome(), this->getAltura(), this->getPeso(), this->getAnoNascimento(), 
-                                                                this->getUniversidade(), this->getCidadeNacimento(), this->getEstadoNascimento());
-    }
-
-    char *strsep(char **stringp, const char *delim){
-        char *begin, *end;
-        begin = *stringp;
-
-        if (begin == NULL) return NULL;
-
-        /* Find the end of the token.  */
-        end = begin + strcspn(begin, delim);
-
-        if (*end)
-        {
-            /* Terminate the token and set *STRINGP past NUL character.  */
-            *end++ = '\0';
-            *stringp = end;
-        }
-        /* No more delimiters; this is the last token.  */
-        else *stringp = NULL;
-        
-        return begin;
-    }
+    //METODOS
 
     void salvar(int id, char linha[TAM_LINHA]){
         // char *strsep(char **stringp, const char *delim);
@@ -169,39 +144,44 @@ struct Jogador {
         this->setEstadoNascimento(substr[7]);;
     }
 
-    void copiar(Jogador J){
+    void imprimir(){
+        printf("[%d ## %s ## %d ## %d ## %d ## %s ## %s ## %s]\n", getId(), getNome(), getAltura(), getPeso(), getAnoNascimento(), 
+                                                                getUniversidade(), getCidadeNacimento(), getEstadoNascimento());
+    }
+
+    void clone(Jogador J){
         this->setId(J.getId());
+        this->setCidadeNacimento(J.getCidadeNacimento());
+        this->setEstadoNascimento(J.getEstadoNascimento());
         this->setNome(J.getNome());
         this->setAltura(J.getAltura());
         this->setPeso(J.getPeso());
-        this->setUniversidade(J.getUniversidade());
         this->setAnoNascimento(J.getAnoNascimento());
-        this->setCidadeNacimento(J.getCidadeNacimento());
-        this->setEstadoNascimento(J.getEstadoNascimento());;
+        this->setUniversidade(J.getUniversidade());
     }
 
 };
 
-void swap(Jogador *i, Jogador *j) {
-   Jogador temp = *i;
-   *i = *j;
-   *j = temp;
-}
+char *strsep(char **stringp, const char *delim){
+    char *begin, *end;
+    begin = *stringp;
 
-void SelectionSortR(Jogador *Jogadores, int i, int n){
-    Jogador temp = Jogador();
+    if (begin == NULL) return NULL;
 
-    if (i < n - 1) {
-        int menor = i;
-        for (int j = (i + 1); j < n; j++){
-            if (strcmp(Jogadores[menor].getNome(), Jogadores[j].getNome()) > 0){
-                menor = j;
-            }
-        }
-        swap(&Jogadores[menor], &Jogadores[i]);
-        SelectionSortR(Jogadores, i+1, n);
+    /* Find the end of the token.  */
+    end = begin + strcspn(begin, delim);
+
+    if (*end)
+    {
+        /* Terminate the token and set *STRINGP past NUL character.  */
+        *end++ = '\0';
+        *stringp = end;
     }
-}
+    /* No more delimiters; this is the last token.  */
+    else *stringp = NULL;
+    
+    return begin;
+    }
 
 void ler (Jogador *Jogadores, int entradas[], int numEntrada){
     FILE *players;
@@ -240,39 +220,64 @@ void ler (Jogador *Jogadores, int entradas[], int numEntrada){
     }
 }
 
+void swap(Jogador *array, int i, int j) {
+   Jogador temp = Jogador();
+   temp.clone(array[i]);
+   array[i].clone(array[j]);
+   array[j].clone(temp);
+}
+
+void bolha(Jogador *Jogadores, int n, int *comp, int *mov){
+    int i, j;
+    for (i = (n - 1); i > 0; i--) {
+      for (j = 0; j < i; j++) {
+        if (Jogadores[j].getAnoNascimento() > Jogadores[j+1].getAnoNascimento()) {
+            swap(Jogadores, j, j + 1);
+            (*comp)++;
+            (*mov)+=3;
+        }else if(Jogadores[j].getAnoNascimento() == Jogadores[j+1].getAnoNascimento()){
+            if(strcmp(Jogadores[j].getNome(), Jogadores[j+1].getNome()) > 0)
+                swap(Jogadores, j, j + 1);
+            (*comp)+=2;
+            (*mov)+=3;
+        }
+      }
+   }
+}
+
 int main(){
-    char entrada[1000][10];
-    int numEntrada = 0;
-    int linha = 0;
+    char entrada_id[1000][10];
+    int numEntrada_id = 0;
     do{
-        lerLinha(entrada[numEntrada], 10, stdin);
-    }while (isFim(entrada[numEntrada++]) == false);
-    numEntrada--;
+        lerLinha(entrada_id[numEntrada_id], 10, stdin);
+    }while (isFim(entrada_id[numEntrada_id++]) == false);
+    numEntrada_id--;
 
     int entrada_inteiro[1000];
 
     for(int i = 0; i < 1000; i++){
-        sscanf(entrada[i], "%d", &entrada_inteiro[i]);
+        sscanf(entrada_id[i], "%d", &entrada_inteiro[i]);
     }
 
+    char saida[1000][TAM_LINHA];
     Jogador _Jogadores[1000];
 
-    ler(_Jogadores, entrada_inteiro, numEntrada);
+    ler(_Jogadores, entrada_inteiro, numEntrada_id);
 
-    // for(int i = 0; i < numEntrada; i++){
-    //     _Jogadores[i].imprimir();
-    // }
+    int comp = 0;
+    int mov = 0;
+    bolha(_Jogadores, numEntrada_id, &comp, &mov);
+
     time_t tempo = clock();
-    SelectionSortR(_Jogadores, 0, numEntrada);
-    tempo = clock() - tempo;
-    for(int i = 0; i < numEntrada; i++){
+    //printf("%s\n", entrada_nome[94]);
+    for(int i = 0; i < numEntrada_id; i++){
         _Jogadores[i].imprimir();
     }
 
+    tempo = clock() - tempo;
+
     FILE *matricula;
-    matricula = fopen("matricula_selecaoRecursiva.txt", "w");
-    int comp = pow(numEntrada, 2)/2 - numEntrada/2;
-    int mov = 3*(numEntrada - 1);
-    fprintf(matricula, "694370\t %d \t %d \t %lu", comp, mov, tempo);
+    matricula = fopen("matricula_binaria.txt", "w");
+    fprintf(matricula, "694370\t %d \t %lu", comp, tempo);
     fclose(matricula);  
 }

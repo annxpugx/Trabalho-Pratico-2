@@ -9,7 +9,7 @@
 #define true 1
 #define false 0
 #define TAM_ARQUIVO 4000
-#define TAM_LINHA 200
+#define TAM_LINHA 300
 
 bool isFim(char *s){
     return (strlen(s) >= 3 && s[0] == 'F' &&
@@ -141,7 +141,11 @@ struct Jogador {
         this->setUniversidade(substr[4]);
         this->setAnoNascimento(inteiros[2]);
         this->setCidadeNacimento(substr[6]);
-        this->setEstadoNascimento(substr[7]);;
+        this->setEstadoNascimento(substr[7]);
+
+        char corrige[] = "nao informado";
+        if(strcmp(getEstadoNascimento(), "") == 0)
+            this->setEstadoNascimento(corrige);
     }
 
     void imprimir(){
@@ -209,9 +213,9 @@ void ler (Jogador *Jogadores, int entradas[], int numEntrada){
                 linhas_corrigidas[j][z] = linhas[j][x];
                 z++;
             }
-            if(x == strlen(linhas[j]) - 2 && linhas[j][x] == ',')
-                strcat(linhas_corrigidas[j],corrige);
         }
+        if(linhas_corrigidas[j][strlen(linhas_corrigidas[j])-2] == ',')
+            strcat(linhas_corrigidas[j],corrige);
     }
 
     for(int i = 0; i < numEntrada; i++){
@@ -232,11 +236,11 @@ void quicksortRec(Jogador *array, int esq, int dir, int *comp, int *mov) {
     Jogador pivo = Jogador();
     pivo.clone(array[(dir+esq)/2]);
     while (i <= j) {
-        while ((strcmp(array[i].getEstadoNascimento(),pivo.getEstadoNascimento()) < 0 || (strcmp(array[i].getEstadoNascimento(),pivo.getEstadoNascimento()) == 0) && strcmp(array[i].getNome(), pivo.getNome()) < 0)){
+        while ((strcmp(array[i].getEstadoNascimento(),pivo.getEstadoNascimento())) < 0 || ((strcmp(array[i].getEstadoNascimento(),pivo.getEstadoNascimento()) == 0) && (strcmp(array[i].getNome(), pivo.getNome()) < 0))){
             i++; 
             (*comp)++;
         }   
-        while ((strcmp(array[j].getEstadoNascimento(),pivo.getEstadoNascimento()) > 0 || (strcmp(array[j].getEstadoNascimento(),pivo.getEstadoNascimento()) == 0) && strcmp(array[j].getNome(), pivo.getNome()) > 0)){
+        while ((strcmp(array[j].getEstadoNascimento(),pivo.getEstadoNascimento())) > 0 || ((strcmp(array[j].getEstadoNascimento(),pivo.getEstadoNascimento()) == 0) && (strcmp(array[j].getNome(), pivo.getNome()) > 0))){
             j--; 
             (*comp)++;
         }
@@ -256,38 +260,37 @@ void quicksort(Jogador *array, int n, int *comp, int *mov) {
 }
 
 int main(){
-    char entrada_id[1000][10];
+    char entrada_id[4000][10];
     int numEntrada_id = 0;
     do{
         lerLinha(entrada_id[numEntrada_id], 10, stdin);
     }while (isFim(entrada_id[numEntrada_id++]) == false);
     numEntrada_id--;
 
-    int entrada_inteiro[1000];
+    int entrada_inteiro[4000];
 
-    for(int i = 0; i < 1000; i++){
+    for(int i = 0; i < numEntrada_id; i++){
         sscanf(entrada_id[i], "%d", &entrada_inteiro[i]);
     }
 
-    char saida[1000][TAM_LINHA];
-    Jogador _Jogadores[1000];
+    char saida[4000][TAM_LINHA];
+    Jogador _Jogadores[4000];
 
     ler(_Jogadores, entrada_inteiro, numEntrada_id);
 
     int comp = 0;
     int mov = 0;
-    quicksort(_Jogadores, numEntrada_id, &comp, &mov);
-
     time_t tempo = clock();
-    //printf("%s\n", entrada_nome[94]);
+    quicksort(_Jogadores, numEntrada_id, &comp, &mov);
+    tempo = clock() - tempo;
+    
+    // printf("%s\n", entrada_nome[94]);
     for(int i = 0; i < numEntrada_id; i++){
         _Jogadores[i].imprimir();
     }
 
-    tempo = clock() - tempo;
-
     FILE *matricula;
-    matricula = fopen("matricula_shellsort.txt", "w");
+    matricula = fopen("matricula_quicksort.txt", "w");
     fprintf(matricula, "694370\t %d \t %d \t %lu", comp, mov, tempo);
     fclose(matricula);  
 }

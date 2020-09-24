@@ -168,68 +168,55 @@ public class Jogador {
                 + getEstadoNascimento() + "]");
     }
 
-    public static void swap(int i, int j) {
-        Jogador temp = Jogadores[i];
-        Jogadores[i] = Jogadores[j];
-        Jogadores[j] = temp;
+    public static void swap(Jogador[] copia, int i, int j) {
+        Jogador temp = copia[i];
+        copia[i] = copia[j];
+        copia[j] = temp;
         mov += 3;
     }
 
-    public static void construir(int tamHeap) {
-        for (int i = tamHeap; i > 1 && (Jogadores[i].getAltura() < Jogadores[i/2].getAltura() || (Jogadores[i].getAltura() == Jogadores[i/2].getAltura() && Jogadores[i].getNome().compareTo(Jogadores[i/2].getNome()) > 0)); i /= 2) {
-            swap(i, i / 2);
-        }
-    }
-
-    public static void reconstruir(int tamHeap) {
-        int i = 1;
-        while (i <= (tamHeap / 2)) {
-            int filho = getMaiorFilho(i, tamHeap);
-            if (Jogadores[i].getAltura() < Jogadores[filho].getAltura() || (Jogadores[i].getAltura() == Jogadores[filho].getAltura() && Jogadores[i].getNome().compareTo(Jogadores[filho].getNome()) > 0) ) { 
-                swap(i, filho);
-                i = filho;
-            } else {
-                i = tamHeap;
-            }
-        }
-    }
-
-    public static int getMaiorFilho(int i, int tamHeap) {
+    public static int getMaiorFilho(Jogador[] copia, int i, int tam){
         int filho;
-        if (2 * i == tamHeap || Jogadores[2 * i].getAltura() > Jogadores[2 * i + 1].getAltura() || (Jogadores[2 * i].getAltura() == Jogadores[2 * i + 1].getAltura() && Jogadores[2 * i].getNome().compareTo(Jogadores[2 * i + 1].getNome()) > 0) ) {
-            filho = 2 * i;
+        comp+=3;
+        if (2*i == tam || copia[2*i].getAltura() > copia[2*i+ 1].getAltura() || (copia[2*i].getAltura() == copia[2*i+ 1].getAltura() && copia[2*i].getNome().compareTo(copia[2*i+ 1].getNome()) > 0)) {
+            filho = 2*i;
         } else {
-            filho = 2 * i + 1;
+            filho = 2*i + 1;
         }
         return filho;
     }
 
-    public static void heapsort(int n) {
-        // Alterar o vetor ignorando a posicao zero
-        Jogador[] tmp = new Jogador[n + 1];
-        for (int i = 0; i < n; i++) {
-            tmp[i + 1] = new Jogador();
-            tmp[i + 1].clone(Jogadores[i]);
+    public static void reconstruir(Jogador[] copia, int tam, int n){
+        int i = 1, filho;
+        while (i <= (tam/2)){
+            filho = getMaiorFilho(copia, i, tam);
+            comp+=3;
+            if (copia[i].getAltura() < copia[filho].getAltura() || (copia[i].getAltura() == copia[filho].getAltura() && copia[i].getNome().compareTo(copia[filho].getNome()) < 0)) {
+                swap(copia, i, filho);
+                i = filho;
+            } else {
+                i = tam;
+            }
         }
-        Jogadores = tmp;
+    }
 
-        // Contrucao do heap
-        for (int tamHeap = 2; tamHeap <= n; tamHeap++) {
-            construir(tamHeap);
+    public static void construir(Jogador[] copia, int tam){
+        comp+=3;
+        for (int i = tam; (i > 1 && copia[i].getAltura() > copia[i/2].getAltura()) || (copia[i].getAltura() == copia[i/2].getAltura() && copia[i].getNome().compareTo(copia[i/2].getNome()) > 0); i /= 2){
+            swap(copia, i, i/2);
         }
+    }
 
-        // Ordenacao propriamente dita
-        int tamHeap = n;
-        while (tamHeap > 1) {
-            swap(1, tamHeap--);
-            reconstruir(tamHeap);
+    public static void heapsort(Jogador[] copia, int n) {
+        //Contrução do heap
+        for (int tam = 2; tam <= n; tam++){
+            construir(copia, tam);
         }
-
-        // Alterar o vetor para voltar a posicao zero
-        tmp = Jogadores;
-        Jogadores = new Jogador[n];
-        for (int i = 0; i < n; i++) {
-            Jogadores[i].clone(tmp[i + 1]);
+        //Ordenacao propriamente dita
+        int tam = n;
+        while (tam > 1){
+            swap(copia, 1, tam--);
+            reconstruir(copia, tam, n);
         }
     }
 
@@ -252,13 +239,26 @@ public class Jogador {
         }
 
         long tempo = System.currentTimeMillis();
-        heapsort(numEntrada);
+
+        Jogador[] copia = new Jogador[numEntrada+1];
+        copia[0] = new Jogador();
+
+        for(int i = 0; i < numEntrada; i++){
+            copia[i+1] = new Jogador();
+            copia[i+1].clone(Jogadores[i]);
+        }
+
+        heapsort(copia, numEntrada);
+
+        for(int i = 0; i < numEntrada; i++){
+            Jogadores[i] = copia[i+1];
+        }
         tempo = (System.currentTimeMillis() - tempo);
 
         for (int i = 0; i < numEntrada; i++)
             Jogadores[i].imprimir();
 
-        Arq.openWrite("matricula_insercao.txt");
+        Arq.openWrite("694370_heapsort.txt");
         Arq.print("694370\t" + comp + "\t" + mov + "\t" + tempo + "ms");
         Arq.close();
     }

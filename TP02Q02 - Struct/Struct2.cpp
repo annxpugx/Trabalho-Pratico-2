@@ -123,21 +123,21 @@ struct Jogador {
 };
 
 void imprimir(int id, char linha[TAM_LINHA]){
-        char *strsep(char **stringp, const char *delim);
-        char *substr[8];
-        for(int i = 0; i < 8; i++)
-            substr[i] = strsep(&linha, ",");
+    char *strsep(char **stringp, const char *delim);
+    char *substr[8];
+    for(int i = 0; i < 8; i++)
+        substr[i] = strsep(&linha, ",");
 
-        int inteiros[3];
-        sscanf(substr[2], "%d", &inteiros[0]);
-        sscanf(substr[3], "%d", &inteiros[1]);
-        sscanf(substr[5], "%d", &inteiros[2]);
+    int inteiros[3];
+    sscanf(substr[2], "%d", &inteiros[0]);
+    sscanf(substr[3], "%d", &inteiros[1]);
+    sscanf(substr[5], "%d", &inteiros[2]);
 
-        Jogador J = Jogador(id, substr[1], inteiros[0], inteiros[1], substr[4], inteiros[2], substr[6], substr[7]);
+    Jogador J = Jogador(id, substr[1], inteiros[0], inteiros[1], substr[4], inteiros[2], substr[6], substr[7]);
 
-        printf("[%d ## %s ## %d ## %d ## %d ## %s ## %s ## %s]\n", J.getId(), J.getNome(), J.getAltura(), J.getPeso(), J.getAnoNascimento(), 
-                                                                J.getUniversidade(), J.getCidadeNacimento(), J.getEstadoNascimento());
-    }
+    printf("[%d ## %s ## %d ## %d ## %d ## %s ## %s ## %s]\n", J.getId(), J.getNome(), J.getAltura(), J.getPeso(), J.getAnoNascimento(), 
+                                                            J.getUniversidade(), J.getCidadeNacimento(), J.getEstadoNascimento());
+}
 
 void ler (int entradas[], int numEntrada){
     FILE *players;

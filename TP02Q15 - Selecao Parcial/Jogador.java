@@ -1,6 +1,12 @@
 import java.io.*; 
 
 public class Jogador{
+
+    public static Jogador[] Jogadores;
+    public static int k = 10;
+    public static int comp = 0;
+    public static int mov = 0;
+
     private int id;
     private int altura;
     private int peso;
@@ -92,18 +98,14 @@ public class Jogador{
 
     //METHODS
 
-    public void clone (Jogador J){
+    // public static Jogador clone (Jogador J){
+    //     Jogador clone = new Jogador();
 
-        this.setId(J.getId());
-        this.setCidadeNacimento(J.getCidadeNacimento());
-        this.setEstadoNascimento(J.getEstadoNascimento());
-        this.setNome(J.getNome());
-        this.setAltura(J.getAltura());
-        this.setPeso(J.getPeso());
-        this.setAnoNascimento(J.getAnoNascimento());
-        this.setUniversidade(J.getUniversidade());
-    
-    }
+    //     clone.setAltura(getAltura());
+    //     clone.setPeso(getPeso());
+    //     clone.setAnoNascimento(getAnoNascimento());
+    //     return clone;
+    // }
 
     public static boolean isFim(String s) {
         return (s.length() >= 3 && s.charAt(0) == 'F' && s.charAt(1) == 'I' && s.charAt(2) == 'M');
@@ -123,32 +125,63 @@ public class Jogador{
         } while (entrada[numEntrada++] != null);
         numEntrada --;
 
-        for(int i = 1; i < numEntrada; i++)
+        for(int i = 1; i < numEntrada; i++){
             if(entrada[i].contains(",,")){
                 entrada[i] = entrada[i].replaceAll(",,", ",nao informado,");
-                int tam = entrada[i].length()-1;
-                if(entrada[i].charAt(tam) == ','){
-                    entrada[i] += "nao informado";   
-                }
+                
             }
+            int tam = entrada[i].length()-1;
+            if(entrada[i].charAt(tam) == ','){
+                entrada[i] += "nao informado";   
+            }
+        }
 
         br.close();
         return entrada;
     }
 
-    public void imprimir(Jogador J, int id, String[] saida) throws Exception{
+    public void salvar(int index, String[] saida) throws Exception{
         
-        String[] imprime = saida[id].split(",");
-        J = new Jogador(id, imprime[1], Integer.parseInt(imprime[2]), Integer.parseInt(imprime[3]), 
-        imprime[4], Integer.parseInt(imprime[5]), imprime[6], imprime[7]);
+        String[] salvar = saida[index].split(",");
+        this.setId(Integer.parseInt(salvar[0]));
+        this.setNome(salvar[1]);
+        this.setAltura(Integer.parseInt(salvar[2]));
+        this.setPeso(Integer.parseInt(salvar[3]));
+        this.setUniversidade(salvar[4]);
+        this.setAnoNascimento(Integer.parseInt(salvar[5]));
+        this.setCidadeNacimento(salvar[6]);
+        this.setEstadoNascimento(salvar[7]);
         
-        MyIO.println("[" + J.getId() + " ## " + J.getNome() + " ## " + J.getAltura() + " ## " + J.getPeso() + " ## " +  J.getAnoNascimento()
-        + " ## " +J.getUniversidade()+ " ## " + J.getCidadeNacimento() + " ## " + J.getEstadoNascimento() + "]");
-
     }
+
+    public void imprimir(){
+        MyIO.println("[" + getId() + " ## " + getNome() + " ## " + getAltura() + " ## " + getPeso() + " ## " +  getAnoNascimento()
+        + " ## " +getUniversidade()+ " ## " + getCidadeNacimento() + " ## " + getEstadoNascimento() + "]");
+    }
+
+    public static void swap(int i, int j) {
+        Jogador temp = Jogadores[i];
+        Jogadores[i] = Jogadores[j];
+        Jogadores[j] = temp;
+        mov += 3;
+    }
+
+    public static void selecao(int n) {
+        for (int i = 0; i < k; i++) {
+           int menor = i;
+            for (int j = (i + 1); j < n; j++){
+                comp++;
+                if (Jogadores[menor].getNome().compareTo(Jogadores[j].getNome()) > 0){
+                    menor = j;
+                }
+            }
+            swap(menor, i);
+        }
+    }
+
         
     public static void main(String[] args) throws Exception{
-        String[] entrada = new String[100];
+        String[] entrada = new String[1000];
         int numEntrada = 0;       
         // Leitura da entrada padrao
         do {
@@ -157,9 +190,23 @@ public class Jogador{
         numEntrada--; // Desconsiderar ultima linha contendo a palavra FIM
 
         String[] saida = ler();
+
+        Jogadores = new Jogador[numEntrada];
+
         for(int i = 0; i < numEntrada; i++){
-            Jogador _Jogador = new Jogador();
-            _Jogador.imprimir(_Jogador, Integer.parseInt(entrada[i]), saida);
+            Jogadores[i] = new Jogador();
+            Jogadores[i].salvar(Integer.parseInt(entrada[i]), saida);
         }
+
+        long tempo = System.currentTimeMillis();
+        selecao(numEntrada);
+        tempo = (System.currentTimeMillis()- tempo);
+
+        for(int i = 0; i < k; i++)
+            Jogadores[i].imprimir();
+
+        Arq.openWrite("matricula_selecao.txt");
+        Arq.print("694370\t" + comp + "\t" + mov + "\t" + tempo + "ms");
+        Arq.close();
     }
 }
